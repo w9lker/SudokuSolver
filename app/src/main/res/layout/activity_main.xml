@@ -17,17 +17,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
+        <Button
             android:id="@+id/backButton"
+            style="@style/Widget.MaterialComponents.TimePicker.Button"
             android:layout_width="match_parent"
-            android:layout_height="51dp"
-            android:layout_margin="5dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:layout_weight="1.5"
-            android:background="#FFFFFF"
-            android:backgroundTint="#FFFFFF"
-            android:importantForAccessibility="no"
-            app:srcCompat="@android:drawable/ic_menu_revert"
-            tools:ignore="SpeakableTextPresentCheck" />
+            android:backgroundTint="#00509C"
+            android:gravity="center|center_horizontal"
+            android:text="Back"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            app:cornerRadius="3dp" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cvRemainingMoves"

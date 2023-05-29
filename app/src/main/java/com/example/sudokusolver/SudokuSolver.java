@@ -2,6 +2,9 @@ package com.example.sudokusolver;
 
 import java.util.Scanner;
 import java.lang.Math;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.Collections;
 
 class SudokuSolver{
     public static boolean isValid(int[][] gameboard)
@@ -69,7 +72,7 @@ class SudokuSolver{
     {
         // we assume that gameboard is solvable
         // then we only need to check whether new entry makes it unsolvable in respective row, column, 3 x 3 grid
-        
+
         //checking row
         for(int i = 0; i < 9; i++)
         {
@@ -106,18 +109,18 @@ class SudokuSolver{
 
     //this method is a helper method that helps find the empty cell and returns whether the the gameboard has empty cells
     // true - there are emmpty cells left; false - no empty cell are left
-    //data[0] represents a row, data[1] represents a column
-    public static boolean hasEmpty(int[][] gameboard, int[] data)
+    //location[0] represents a row, location[1] represents a column
+    public static boolean hasEmpty(int[][] gameboard, int[] location)
     {
- 
+
         for(int i = 0; i < 9; i++)
         {
             for(int j = 0; j < 9; j++)
             {
                 if(gameboard[i][j] == 0)
                 {
-                    data[0] = i;
-                    data[1] = j;
+                    location[0] = i;
+                    location[1] = j;
                     return true;
                 }
             }
@@ -169,7 +172,7 @@ class SudokuSolver{
                     gameboard[location[0]][location[1]] = i;
                     count += uniqueSolutions(gameboard);
                     if(count >= 2)
-                    { 
+                    {
                         return 2;
                     }
                     else if(count < 2)
@@ -181,7 +184,7 @@ class SudokuSolver{
         }
         else{
             return 1;
-        } 
+        }
         return count;
     }
 
@@ -216,52 +219,69 @@ class SudokuSolver{
 
         return gameboard;
     }
-
-    public static boolean hasEmptyRandom(int[][] gameboard, int[] data)
+    //helper function
+    public static boolean hasEmptyRandom(int[][] gameboard, int[] location, int[]coordinates)
     {
-        //picking random number in a range 0 - 80
-        int max = 80, min = 0;
-        int count = 0;
-        while(count < 1)
-        {
-            int random = (int)Math.floor(Math.random() * (max - min + 1) + min);
-            if(gameboard[random / 9][random % 9] == 0)
-            {
-                data[0] = random / 9;
-                data[1] = random % 9;
-                return true;
-            }
-            count++;
-        }
 
-        for(int i = 0; i < 9; i++)
-        {
-            for(int j = 0; j < 9; j++)
-            {
-                if(gameboard[i][j] == 0)
-                {
-                    data[0] = i;
-                    data[1] = j;
-                    return true;
-                }
+        for(int i = 0; i < 81; i++){
+            int coordinate = coordinates[i];
+            if(gameboard[coordinate / 9][coordinate % 9] == 0){
+                location[0] = coordinate / 9;
+                location[1] = coordinate % 9;
+                return true;
             }
         }
         return false;
     }
+    public static void shuffleArray(int[] array){
+        // If running on Java 6 or older, use `new Random()` on RHS here
+        Random rand = new Random();
+        for (int i = array.length - 1; i > 0; i--)
+        {
+            int index = rand.nextInt(i + 1);
+            // Simple swap
+            int a = array[index];
+            array[index] = array[i];
+            array[i] = a;
+        }
+    }
 
-//N is the number of missing entries in a Sudoku Board
-    public static boolean RandomCompleteSudoku(int[][] gameboard)
+
+    public static void GenerateRandomCompleteSudoku(int[][] gameboard){
+        int[] coordinates = new int[81];
+        for( int k = 0; k < 81; k++){
+            coordinates[k] = k;
+        }
+        int[] tobeShuffled = new int[30];
+        for(int i = 0; i < 30; i++){
+            tobeShuffled[i] = i;
+        }
+        shuffleArray(tobeShuffled);
+        for(int j = 0; j < 30; j++){
+            coordinates[j] = tobeShuffled[j];
+        }
+
+
+        //shuffle coordinates
+        //for optimization purposes, i will only shuffle the first 30 coordinates
+
+
+        RandomCompleteSudoku(gameboard, coordinates);
+
+    }
+
+    //helper-function
+    public static boolean RandomCompleteSudoku(int[][] gameboard, int[] coordinates)
     {
-        //generating random valid board
         //using the alternative of SolveSudoku, where picking cells is randomized
         int[] location = new int[2];
-        if(hasEmptyRandom(gameboard, location))
+        if(hasEmptyRandom(gameboard, location, coordinates))
         {
             for(int i = 1; i < 10; i++){
                 if(isSafe(gameboard, location[0], location[1], i))
                 {
                     gameboard[location[0]][location[1]] = i;
-                    if(RandomCompleteSudoku(gameboard))
+                    if(RandomCompleteSudoku(gameboard, coordinates))
                     {
                         return true;
                     }
@@ -279,14 +299,14 @@ class SudokuSolver{
         return false;
     }
 
-//N indicated the number of empty cells, it has to be less than 64
+    //N indicated the number of empty cells, it has to be less than 64
     public static void GenerateSudoku(int[][] gameboard, int N)
     {
         //generating the completed board first
-        RandomCompleteSudoku(gameboard);
+        GenerateRandomCompleteSudoku(gameboard);
         if(isValid(gameboard))
         {
-             putZeros(gameboard, N);
+            putZeros(gameboard, N);
         }
     }
     //helper function
@@ -318,7 +338,7 @@ class SudokuSolver{
                     }
                 }
             }
-            
+
 
         }
         return false;
@@ -326,9 +346,9 @@ class SudokuSolver{
     }
     //helper function
     public static boolean chooseCell(int[][] gameboard, int[] location)
-    {   
+    {
         //choose the random cell
-        int random = (int)Math.floor(Math.random() * 81); 
+        int random = (int)Math.floor(Math.random() * 81);
         int row = random / 9, column = random % 9;
         int value = gameboard[row][column];
         gameboard[row][column] = 0;
@@ -339,7 +359,7 @@ class SudokuSolver{
             //choose the next non-empty cell which leads to unique solution
             for(int i = 0; i < 9; i++)
             {
-               for(int j = 0; j < 9; j++)
+                for(int j = 0; j < 9; j++)
                 {
                     value = gameboard[i][j];
                     gameboard[i][j] = 0;
@@ -378,24 +398,33 @@ class SudokuSolver{
 
     public static void main(String[] args)
     {
-        int[][] gameboard = new int[][] 
-        {
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-        };
+        int[][] gameboard = new int[][]
+                {
+                        { 3, 1, 5, 4, 8, 2, 9, 6, 7 },
+                        { 4, 9, 2, 7, 6, 5, 1, 3, 8 },
+                        { 6, 7, 8, 1, 9, 3, 2, 4, 5 },
+                        { 7, 2, 3, 9, 1, 6, 5, 8, 4 },
+                        { 9, 6, 4, 2, 5, 8, 7, 1, 3 },
+                        { 5, 8, 1, 3, 7, 4, 6, 9, 2 },
+                        { 8, 5, 7, 6, 3, 1, 4, 2, 9 },
+                        { 2, 3, 6, 5, 4, 9, 8, 7, 1 },
+                        { 1, 4, 9, 8, 2, 7, 3, 5, 6 }
+                };
+
+        int[][] gameboard_2 = new int[9][9];
+        for(int i = 0; i < 9; i++){
+            for(int j = 0; j < 9; j++){
+                gameboard_2[i][j] = 0;
+            }
+        }
+
         int[][] gameboard_1 = gameboard.clone();
         for(int i = 0; i < 9; i++){
             gameboard_1[i] = gameboard[i].clone();
         }
-        GenerateSudoku(gameboard_1,51);
-        printBoard(gameboard_1);
+
+        GenerateSudoku(gameboard_2, 52);
+        printBoard(gameboard_2);
     }
 
 }

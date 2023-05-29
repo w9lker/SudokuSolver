@@ -12,6 +12,7 @@ import org.w3c.dom.Text
 class MainActivity : AppCompatActivity() {
     private var numArray = Array(9){IntArray(9){0} }
     private lateinit var matrix: Array<Array<TextView?>>
+    private var generatedMatrix = Array(9){IntArray(9){0} }
     private lateinit var numPad: Array<Button?>
     private lateinit var remainingMoves: TextView
     private var issueCoordinates = IntArray(27){100}
@@ -126,7 +127,7 @@ class MainActivity : AppCompatActivity() {
         Helper.cleanArray(numArray)
         Helper.cleanArray(matrix)
 
-        SudokuSolver.GenerateSudoku(numArray,10);
+        SudokuSolver.GenerateSudoku(numArray,0);
         for(i in 0..8){
             for(j in 0..8){
                 if(numArray[i][j] != 0){
@@ -135,6 +136,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        for(i in 0..8 ){
+            for(j in 0..8){
+                generatedMatrix[i][j] = numArray[i][j]
+            }
+        }
+
         var displayText = "Remaining: ${Helper.numCellsLeft(numArray)}"
         remainingMoves.text = displayText
 
@@ -147,14 +155,19 @@ class MainActivity : AppCompatActivity() {
         for(i in 0..8){
             for(j in 0..8){
                 if (matrix[i][j]?.id == textView?.id){
-                    coordinate = i*9+j
+                    if(generatedMatrix[i][j] ==0){
+                        coordinate = i*9+j
+                    }
+                    else{
+                        textView?.setBackgroundColor(Color.WHITE)
+                    }
                 }
             }
         }
     }
 
     fun clicknumber(button:View?){
-        var row:Int = coordinate /9
+        var row:Int = coordinate / 9
         var column: Int = coordinate % 9
         for(i in 0..8){
             if(numPad[i]?.id == button?.id){
@@ -173,9 +186,45 @@ class MainActivity : AppCompatActivity() {
                 println("Sth is wrong")
             }
         }
+        //check for conflicting cells
+
 
         //update the cells left
         var displayText = "Remaining: $cellsLeft"
         remainingMoves.text = displayText
+    }
+
+    fun clearCell(view: View?){
+        var row = coordinate / 9
+        var column = coordinate % 9
+        matrix[row][column]?.text = ""
+        numArray[row][column] = 0
+    }
+
+    fun solve(view: View?){
+        var originalMatrix = Array(9){IntArray(9){0} }
+        for(i in 0..8){
+            for(j in 0..8){
+                originalMatrix[i][j] = generatedMatrix[i][j]
+            }
+        }
+
+        SudokuSolver.solveSudoku(generatedMatrix)
+        for(i in 0..8){
+            for(j in 0..8){
+                if(originalMatrix[i][j] == 0){
+                    matrix[i][j]?.text = generatedMatrix[i][j].toString()
+                    matrix[i][j]?.setTextColor(Color.BLACK)
+                    if(numArray[i][j] != 0){
+                        if(numArray[i][j] == generatedMatrix[i][j]){
+                            matrix[i][j]?.setBackgroundColor(Color.GREEN)
+                        }
+                        else if(numArray[i][j] != generatedMatrix[i][j]){
+                            matrix[i][j]?.setBackgroundColor(Color.RED)
+                        }
+                    }
+                }
+            }
+        }
     }
 }

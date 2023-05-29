@@ -1852,6 +1852,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:backgroundTint="#003f88"
+                android:onClick="solve"
                 android:text="Solve"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:textColor="#FFFFFF"
@@ -1873,12 +1874,13 @@
                 app:cornerRadius="3dp" />
 
             <Button
-                android:id="@+id/generateButton"
+                android:id="@+id/clearButton"
                 style="@style/Widget.MaterialComponents.TimePicker.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:backgroundTint="#003f88"
+                android:onClick="clearCell"
                 android:text="Clear"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:textColor="#FDFCFC"

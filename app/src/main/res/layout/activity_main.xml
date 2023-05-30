@@ -27,6 +27,7 @@
             android:layout_weight="1.5"
             android:backgroundTint="#00509C"
             android:gravity="center|center_horizontal"
+            android:onClick="clickBackButton"
             android:text="Back"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textColor="#FFFFFF"
@@ -1308,6 +1309,7 @@
                 android:background="#000000"
                 android:contentDescription="SudokuNumber"
                 android:gravity="center"
+                android:orientation="vertical"
                 android:paddingRight="1dp"
                 android:paddingBottom="1dp"
                 android:scaleX="1">

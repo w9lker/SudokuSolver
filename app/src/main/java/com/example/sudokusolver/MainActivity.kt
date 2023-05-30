@@ -1,22 +1,27 @@
 package com.example.sudokusolver
 
+import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import androidx.cardview.widget.CardView
-import org.w3c.dom.Text
+
 
 class MainActivity : AppCompatActivity() {
     private var numArray = Array(9){IntArray(9){0} }
     private lateinit var matrix: Array<Array<TextView?>>
-    private var generatedMatrix = Array(9){IntArray(9){0} }
+    private var generatedArray = Array(9){IntArray(9){0} }
     private lateinit var numPad: Array<Button?>
     private lateinit var remainingMoves: TextView
-    private var issueCoordinates = IntArray(27){100}
-    private var coordinate = 0
+    private lateinit var backButton: Button
+    private var gameFinished = false;
+    private var Difficutly = 0;
+    private var initialEmptyCells = 3;
+    //99 is used to denote that coordinate is empty, this is later adapted in code
+    private var coordinate = 99
+
 
 
 
@@ -25,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         remainingMoves = findViewById<TextView>(R.id.remainingMoves)
+        backButton = findViewById<Button>(R.id.backButton)
 
         matrix = Array(9) { arrayOfNulls<TextView>(9) }
         matrix[0][0] = findViewById<TextView>(R.id.textView0)
@@ -123,11 +129,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun clickGenerate(view: View?){
+        gameFinished = false
         //cleaning both numArray and matrix(array of TextViews)
         Helper.cleanArray(numArray)
         Helper.cleanArray(matrix)
+        Helper.cleanArray(generatedArray)
+        //cleaning position place
+        if(coordinate != 99){
+            matrix[coordinate / 9][coordinate % 9]?.setBackgroundColor(Color.WHITE)
+            coordinate = 99
+        }
 
-        SudokuSolver.GenerateSudoku(numArray,0);
+        SudokuSolver.GenerateSudoku(numArray,initialEmptyCells)
         for(i in 0..8){
             for(j in 0..8){
                 if(numArray[i][j] != 0){
@@ -139,27 +152,31 @@ class MainActivity : AppCompatActivity() {
 
         for(i in 0..8 ){
             for(j in 0..8){
-                generatedMatrix[i][j] = numArray[i][j]
+                generatedArray[i][j] = numArray[i][j]
             }
         }
 
         var displayText = "Remaining: ${Helper.numCellsLeft(numArray)}"
         remainingMoves.text = displayText
+        remainingMoves.setBackgroundColor(Color.WHITE)
 
     }
     fun clickCell(textView:View?){
-        var row:Int = coordinate / 9
-        var column:Int = coordinate % 9
-        matrix[row][column]?.setBackgroundColor(Color.WHITE)
-        textView?.setBackgroundColor(Color.GRAY)
-        for(i in 0..8){
-            for(j in 0..8){
-                if (matrix[i][j]?.id == textView?.id){
-                    if(generatedMatrix[i][j] ==0){
-                        coordinate = i*9+j
-                    }
-                    else{
-                        textView?.setBackgroundColor(Color.WHITE)
+        if(coordinate != 99){
+            var row:Int = coordinate / 9
+            var column:Int = coordinate % 9
+            matrix[row][column]?.setBackgroundColor(Color.WHITE)
+        }
+        if(!gameFinished) {
+            textView?.setBackgroundColor(Color.GRAY)
+            for (i in 0..8) {
+                for (j in 0..8) {
+                    if (matrix[i][j]?.id == textView?.id) {
+                        if (generatedArray[i][j] == 0) {
+                            coordinate = i * 9 + j
+                        } else {
+                            textView?.setBackgroundColor(Color.WHITE)
+                        }
                     }
                 }
             }
@@ -167,64 +184,95 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun clicknumber(button:View?){
-        var row:Int = coordinate / 9
-        var column: Int = coordinate % 9
-        for(i in 0..8){
-            if(numPad[i]?.id == button?.id){
-                matrix[row][column]?.text = (i+1).toString()
-                matrix[row][column]?.setTextColor(Color.BLUE)
-                numArray[row][column] = (i+1)
+        if(coordinate != 99){
+            var row:Int = coordinate / 9
+            var column: Int = coordinate % 9
+            for(i in 0..8){
+                if(numPad[i]?.id == button?.id){
+                    matrix[row][column]?.text = (i+1).toString()
+                    matrix[row][column]?.setTextColor(Color.BLUE)
+                    numArray[row][column] = (i+1)
+                }
             }
         }
+
         //check for win
         var cellsLeft = Helper.numCellsLeft(numArray)
         if(cellsLeft == 0){
             if(SudokuSolver.isValid(numArray)){
-                println("Niceee")
+                if(!gameFinished){
+                    gameFinished = true
+                    remainingMoves.text = "You won!"
+                    remainingMoves.setBackgroundColor(Color.GREEN)
+                    SudokuSolver.solveSudoku(generatedArray)
+                    matrix[coordinate / 9][coordinate % 9]?.setBackgroundColor(Color.WHITE)
+                    coordinate = 99
+                }
             }
             else{
-                println("Sth is wrong")
+                remainingMoves.setBackgroundColor(Color.RED)
             }
         }
         //check for conflicting cells
 
 
         //update the cells left
-        var displayText = "Remaining: $cellsLeft"
-        remainingMoves.text = displayText
+        if(!gameFinished){
+            var displayText = "Remaining: $cellsLeft"
+            remainingMoves.text = displayText
+        }
     }
 
     fun clearCell(view: View?){
-        var row = coordinate / 9
-        var column = coordinate % 9
-        matrix[row][column]?.text = ""
-        numArray[row][column] = 0
+        if(coordinate != 99){
+            var row = coordinate / 9
+            var column = coordinate % 9
+            matrix[row][column]?.text = ""
+            numArray[row][column] = 0
+        }
     }
 
     fun solve(view: View?){
         var originalMatrix = Array(9){IntArray(9){0} }
         for(i in 0..8){
             for(j in 0..8){
-                originalMatrix[i][j] = generatedMatrix[i][j]
+                originalMatrix[i][j] = generatedArray[i][j]
             }
         }
 
-        SudokuSolver.solveSudoku(generatedMatrix)
+        SudokuSolver.solveSudoku(generatedArray)
+        gameFinished = true
+        remainingMoves.setBackgroundColor(Color.WHITE)
+        remainingMoves.text = "Remaining: 0"
+
+        //clearing coordinate
+        if(coordinate != 99){
+            matrix[coordinate / 9][coordinate % 9]?.setBackgroundColor(Color.WHITE)
+            coordinate = 99
+        }
         for(i in 0..8){
             for(j in 0..8){
                 if(originalMatrix[i][j] == 0){
-                    matrix[i][j]?.text = generatedMatrix[i][j].toString()
+                    matrix[i][j]?.text = generatedArray[i][j].toString()
                     matrix[i][j]?.setTextColor(Color.BLACK)
                     if(numArray[i][j] != 0){
-                        if(numArray[i][j] == generatedMatrix[i][j]){
+                        if(numArray[i][j] == generatedArray[i][j]){
                             matrix[i][j]?.setBackgroundColor(Color.GREEN)
                         }
-                        else if(numArray[i][j] != generatedMatrix[i][j]){
+                        else if(numArray[i][j] != generatedArray[i][j]){
                             matrix[i][j]?.setBackgroundColor(Color.RED)
                         }
+                    }
+                    else{
+                        matrix[i][j]?.setBackgroundColor(Color.GRAY)
                     }
                 }
             }
         }
+    }
+
+    fun clickBackButton(view: View?){
+        val intent = Intent(this,InitialActivity::class.java)
+        startActivity(intent)
     }
 }

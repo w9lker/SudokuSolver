@@ -1,11 +1,11 @@
 # SudokuSolver
 An android app that generates and lets user solve random Sudoku with determined amount of remaining cells. 
 
-Note: The difficulty of Sudoku isnt determined by the number of remaining cells left. What determines the difficulty is the number of advanced tools that need to be used when solving the Sudoku. However the number of empty cells has a positive correlation with the difficulty of the Sudoku, so Sudokus with less initial cells tend to be harder on average.
+Notes: The difficulty of Sudoku isnt determined by the number of remaining cells left. What determines the difficulty is the number of advanced tools that need to be used when solving the Sudoku. However the number of empty cells has a positive correlation with the difficulty of the Sudoku, so Sudokus with less initial cells tend to be harder on average.
 
 Features of the app:
 	-Has 3 modes of difficulty(Beginner, Easy, Medium) with corresponsing number of empty cells initially
-	-Has a build-in timer to determine how much it takes one to finish the Sudoku
+	-Has a built-in timer to determine how much it takes one to finish the Sudoku
 	-UI supports almost all mobile devices with some restrictions(cause of the hardcoded size of the text)
 
 Fun ideas for further improvement:

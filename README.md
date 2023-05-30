@@ -5,7 +5,7 @@ An android app that generates and lets user solve random Sudoku with determined 
 The difficulty of Sudoku isnt determined by the number of remaining cells left. What determines the difficulty is the number of advanced tools that need to be used when solving the Sudoku. However the number of empty cells has a positive correlation with the difficulty of the Sudoku, so Sudokus with less initial cells tend to be harder on average.  
   
 ## Features
-* Has 3 modes of difficulty(Beginner, Easy, Medium) with corresponsing number of empty cells initially  
+* Has 3 modes of difficulty (Beginner, Easy, Medium) with corresponsing number of empty cells initially  
 * Has a built-in timer to determine how much it takes one to finish the Sudoku  
 * UI supports almost all mobile devices with some restrictions(cause of the hardcoded size of the text)  
 
@@ -21,4 +21,4 @@ The difficulty of Sudoku isnt determined by the number of remaining cells left. 
 ```
 git clone https://github.com/w9lker/SudokuSolver
 ```
-3.Open the project in Android Studio
+3. Open the project in Android Studio

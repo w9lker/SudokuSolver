@@ -14,6 +14,6 @@ The difficulty of Sudoku isnt determined by the number of remaining cells left. 
 * Animations and Efects for losing/winning  
 * Online 1v1 competitions for the best time for some randomly generated Sudoku. This one can be improved even further with adding ranking system  
 * Custom Sudoku Board skins that can be changed thru settings or maybe an in-game currency that can be used to buy them  
-	  
-How to start experimenting with this?  
-	
+
+### Setting up the Development Environment
+Tested version: Android Studio Flamingo | 2022.2.1 [download it here](https://developer.android.com/studio)

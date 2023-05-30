@@ -59,13 +59,11 @@
             android:layout_weight="1.5"
             app:cardCornerRadius="20dp">
 
-            <TextView
-                android:id="@+id/tvTimePassed"
+            <Chronometer
+                android:id = "@+id/timer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:padding="8dp"
-                android:text="00:00"
+                android:gravity = "center"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large" />
         </androidx.cardview.widget.CardView>
 

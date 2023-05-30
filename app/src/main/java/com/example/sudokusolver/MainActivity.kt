@@ -4,8 +4,10 @@ import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.View
 import android.widget.Button
+import android.widget.Chronometer
 import android.widget.TextView
 
 
@@ -16,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var numPad: Array<Button?>
     private lateinit var remainingMoves: TextView
     private lateinit var backButton: Button
+    private lateinit var timer: Chronometer
     private var gameFinished = false;
     private var Difficutly = 0;
     private var initialEmptyCells = 3;
@@ -29,8 +32,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        timer = findViewById<Chronometer>(R.id.timer)
         remainingMoves = findViewById<TextView>(R.id.remainingMoves)
         backButton = findViewById<Button>(R.id.backButton)
+
+        //initializing Difficulty and number of initialEmptyCells
+        //Difficuly can be 1(beginner), 2(easy), 3(medium)
+        Difficutly = intent.getIntExtra("DifficultyLevel",0)
+        initialEmptyCells = when(Difficutly){
+            1 -> 10
+            2 -> 30
+            3 -> 50
+            else -> 0
+        }
 
         matrix = Array(9) { arrayOfNulls<TextView>(9) }
         matrix[0][0] = findViewById<TextView>(R.id.textView0)
@@ -139,6 +153,9 @@ class MainActivity : AppCompatActivity() {
             matrix[coordinate / 9][coordinate % 9]?.setBackgroundColor(Color.WHITE)
             coordinate = 99
         }
+        //starting timer
+        timer.setBase(SystemClock.elapsedRealtime())
+        timer.start()
 
         SudokuSolver.GenerateSudoku(numArray,initialEmptyCells)
         for(i in 0..8){
@@ -159,8 +176,9 @@ class MainActivity : AppCompatActivity() {
         var displayText = "Remaining: ${Helper.numCellsLeft(numArray)}"
         remainingMoves.text = displayText
         remainingMoves.setBackgroundColor(Color.WHITE)
-
     }
+
+
     fun clickCell(textView:View?){
         if(coordinate != 99){
             var row:Int = coordinate / 9
@@ -183,6 +201,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     fun clicknumber(button:View?){
         if(coordinate != 99){
             var row:Int = coordinate / 9
@@ -201,6 +220,9 @@ class MainActivity : AppCompatActivity() {
         if(cellsLeft == 0){
             if(SudokuSolver.isValid(numArray)){
                 if(!gameFinished){
+                    //stopping and resetting timer
+                    timer.stop()
+
                     gameFinished = true
                     remainingMoves.text = "You won!"
                     remainingMoves.setBackgroundColor(Color.GREEN)
@@ -213,15 +235,12 @@ class MainActivity : AppCompatActivity() {
                 remainingMoves.setBackgroundColor(Color.RED)
             }
         }
-        //check for conflicting cells
-
-
-        //update the cells left
         if(!gameFinished){
             var displayText = "Remaining: $cellsLeft"
             remainingMoves.text = displayText
         }
     }
+
 
     fun clearCell(view: View?){
         if(coordinate != 99){
@@ -233,6 +252,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun solve(view: View?){
+        //stopping and resetting the timer
+        timer.setBase(SystemClock.elapsedRealtime())
+        timer.stop()
+
         var originalMatrix = Array(9){IntArray(9){0} }
         for(i in 0..8){
             for(j in 0..8){

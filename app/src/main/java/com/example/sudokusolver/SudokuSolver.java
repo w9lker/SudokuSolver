@@ -1,10 +1,8 @@
 package com.example.sudokusolver;
 
-import java.util.Scanner;
 import java.lang.Math;
-import java.util.Arrays;
 import java.util.Random;
-import java.util.Collections;
+
 
 class SudokuSolver{
     public static boolean isValid(int[][] gameboard)
@@ -129,7 +127,7 @@ class SudokuSolver{
     }
 
     //assume that initially board doesn't have any mistakes
-    public static boolean solveSudoku(int gameboard[][])
+    public static boolean solveSudoku(int[][] gameboard)
     {
         int[] location = new int[2];
         if(hasEmpty(gameboard, location))
@@ -175,8 +173,7 @@ class SudokuSolver{
                     {
                         return 2;
                     }
-                    else if(count < 2)
-                    {
+                    else {
                         gameboard[location[0]][location[1]] = 0;
                     }
                 }
@@ -201,24 +198,6 @@ class SudokuSolver{
         System.out.print("\n\n");
     }
 
-    //takes input as a string consisting of integers 000000000000000000000000000000000000000000000000000000...0
-    public static int[][] createBoard()
-    {
-        //initializing gameboard filled with 0's
-        int[][] gameboard = new int[9][9];
-        Scanner scanner = new Scanner(System.in);
-        String input = scanner.nextLine();
-        scanner.close();
-        for(int i = 0; i < 9; i++)
-        {
-            for(int j = 0; j < 9; j++)
-            {
-                gameboard[i][j] = (input.charAt(9*i + j) -'0');
-            }
-        }
-
-        return gameboard;
-    }
     //helper function
     public static boolean hasEmptyRandom(int[][] gameboard, int[] location, int[]coordinates)
     {
@@ -257,9 +236,7 @@ class SudokuSolver{
             tobeShuffled[i] = i;
         }
         shuffleArray(tobeShuffled);
-        for(int j = 0; j < 30; j++){
-            coordinates[j] = tobeShuffled[j];
-        }
+        System.arraycopy(tobeShuffled, 0, coordinates, 0, 30);
 
 
         //shuffle coordinates
@@ -302,11 +279,32 @@ class SudokuSolver{
     //N indicated the number of empty cells, it has to be less than 64
     public static void GenerateSudoku(int[][] gameboard, int N)
     {
-        //generating the completed board first
-        GenerateRandomCompleteSudoku(gameboard);
-        if(isValid(gameboard))
-        {
-            putZeros(gameboard, N);
+        boolean valid = false;
+        //there is currently a bug that I am still working on for higher values of N. putzeros function generates the incorrect gameboard
+        //temporary solution is to regenerate the gameboard since the problem only occurs around 15% times for high values of N(like N = 50).
+        //the error wasn't observed for smaller values N
+        while(!valid){
+            //empty array
+            int[][] array = new int[9][9];
+            for(int i = 0; i < 9;i++){
+                for(int j = 0; j < 9; j++){
+                    array[i][j] = 0;
+                }
+            }
+
+            GenerateRandomCompleteSudoku(array);
+            if(isValid(array)){
+                putZeros(array, N);
+            }
+            for(int i = 0; i < 9; i++){
+                for(int j = 0; j < 9; j++){
+                    gameboard[i][j] = array[i][j];
+                }
+            }
+            solveSudoku(array);
+            if(isValid(gameboard)){
+                valid = true;
+            }
         }
     }
     //helper function
@@ -318,7 +316,7 @@ class SudokuSolver{
             return true;
         }
         else{
-            for(int i = 0; i < 5; i++)
+            for(int i = 0; i < 3 ; i++)
             {
                 if(!chooseCell(gameboard, location)){
                     return false;
@@ -398,33 +396,9 @@ class SudokuSolver{
 
     public static void main(String[] args)
     {
-        int[][] gameboard = new int[][]
-                {
-                        { 3, 1, 5, 4, 8, 2, 9, 6, 7 },
-                        { 4, 9, 2, 7, 6, 5, 1, 3, 8 },
-                        { 6, 7, 8, 1, 9, 3, 2, 4, 5 },
-                        { 7, 2, 3, 9, 1, 6, 5, 8, 4 },
-                        { 9, 6, 4, 2, 5, 8, 7, 1, 3 },
-                        { 5, 8, 1, 3, 7, 4, 6, 9, 2 },
-                        { 8, 5, 7, 6, 3, 1, 4, 2, 9 },
-                        { 2, 3, 6, 5, 4, 9, 8, 7, 1 },
-                        { 1, 4, 9, 8, 2, 7, 3, 5, 6 }
-                };
+        //was used mostly for debugging
 
-        int[][] gameboard_2 = new int[9][9];
-        for(int i = 0; i < 9; i++){
-            for(int j = 0; j < 9; j++){
-                gameboard_2[i][j] = 0;
-            }
-        }
-
-        int[][] gameboard_1 = gameboard.clone();
-        for(int i = 0; i < 9; i++){
-            gameboard_1[i] = gameboard[i].clone();
-        }
-
-        GenerateSudoku(gameboard_2, 52);
-        printBoard(gameboard_2);
     }
+
 
 }

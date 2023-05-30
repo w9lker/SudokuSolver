@@ -16,4 +16,9 @@ The difficulty of Sudoku isnt determined by the number of remaining cells left. 
 * Custom Sudoku Board skins that can be changed thru settings or maybe an in-game currency that can be used to buy them  
 
 ### Setting up the Development Environment
-Tested version: Android Studio Flamingo | 2022.2.1 [download it here](https://developer.android.com/studio)
+1. Download and Install Android Studio Flamingo | 2022.2.1 [(You can download it here)](https://developer.android.com/studio)
+2. Clone the repository using
+```
+git clone https://github.com/w9lker/SudokuSolver
+```
+3.Open the project in Android Studio
